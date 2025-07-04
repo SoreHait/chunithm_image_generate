@@ -33,7 +33,8 @@ class ChuniScoreListGenerate2025:
         base.paste(jacket, (200, 255), jacket_mask)
 
         font = ImageFont.truetype(os.path.join(FONT_PATH, 'LINESeedJP_OTF_Bd.otf'), size=120)
-        base_draw.text((500, 960), f'{record.score:,}', fill='black', font=font, anchor='mm')
+        score_txt = f'{record.score:,}' if record.score >= 0 else 'N/P'
+        base_draw.text((500, 960), score_txt, fill='black', font=font, anchor='mm')
 
         return base
 

@@ -13,7 +13,7 @@ def get_louis_player(account: Union[str, int], *, qq: bool) -> player.Player:
         raise requests.exceptions.HTTPError("Failed to get player info. Using API: louis")
     return player.Player.from_louis(resp.json())
 
-def get_louis_scorelist(account: Union[str, int], level: str, *, qq: bool) -> scorelist.ScoreList:
+def get_louis_scorelist(account: Union[str, int], level: str, keep_all: bool = False, *, qq: bool) -> scorelist.ScoreList:
     endpoint = f"{LOUIS_URL}/api/open/chunithm/filtered-info"
     body = {"qq" if qq else "username": account, "level": f"{level}-{level}"}
     resp = requests.post(endpoint, json=body, headers=LOUIS_HEADERS)
@@ -21,6 +21,8 @@ def get_louis_scorelist(account: Union[str, int], level: str, *, qq: bool) -> sc
         raise requests.exceptions.HTTPError("Failed to get player scorelist. Using API: louis")
     player_model = get_louis_player(account, qq=qq)
     song_data = cache_manage.get_louis_constant()
+    if keep_all:
+        return scorelist.ScoreList.from_louis_all(player_model, resp.json(), song_data, level)
     return scorelist.ScoreList.from_louis(player_model, resp.json(), song_data)
 
 def get_louis_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:

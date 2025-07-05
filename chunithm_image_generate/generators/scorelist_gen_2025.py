@@ -30,24 +30,24 @@ class ChuniScoreListGenerate2025:
         jacket_mask = Image.new('1', (600, 600))
         draw_mask = ImageDraw.Draw(jacket_mask)
         draw_mask.rounded_rectangle((0, 0, 600, 600), 120, fill='white')
-        base.paste(jacket, (200, 255), jacket_mask)
+        base.paste(jacket, (round((base.width - jacket.width) / 2), 126), jacket_mask)
 
         font = ImageFont.truetype(os.path.join(FONT_PATH, 'LINESeedJP_OTF_Bd.otf'), size=120)
         score_txt = f'{record.score:,}' if record.score >= 0 else 'N/P'
-        base_draw.text((500, 960), score_txt, fill='black', font=font, anchor='mm')
+        base_draw.text((round(base.width / 2), 831), score_txt, fill='black', font=font, anchor='mm')
 
         return base
 
     @staticmethod
     def generate_scorelist_layout(score_list: scorelist.ScoreList, api: str) -> Image.Image:
         line_len = 9
-        scale_to = (x := 275, x * 450 // 375)
-        top_padding = 500
-        bottom_padding = 300
-        starting_at = (135, top_padding)
-        spacing = -30
-        y_compensate = -20
-        category_compensate = -20
+        scale_to = (x := 235, 997 * x // 855)
+        top_padding = 480
+        bottom_padding = 290
+        starting_at = (148, top_padding)
+        spacing = 11
+        y_compensate = 0
+        category_compensate = 0
 
         if len(score_list.score_list) == 0:
             raise ValueError(f"User Bests has no records. Using API: {api}")
@@ -83,16 +83,18 @@ class ChuniScoreListGenerate2025:
 
         base_draw = ImageDraw.Draw(base)
         font = ImageFont.truetype(os.path.join(FONT_PATH, 'LINESeedJP_OTF_Bd.otf'), size=80)
-        current_y = 0
+        current_y = -category_compensate
         sssp_counter = 0
         sss_counter = 0
         aj_counter = 0
         fc_counter = 0
+        overlay = Image.new('RGBA', (base.width, base.height))
+        overlay_draw = ImageDraw.Draw(overlay)
         for constant_group in constant_categorized:
             current_y += category_compensate
-            base.alpha_composite(constant_background, (base.width // 2 - constant_background.width // 2, starting_at[1] + current_y))
+            overlay.paste(constant_background, (base.width // 2 - constant_background.width // 2, starting_at[1] + current_y))
             current_y += constant_background.height // 2
-            base_draw.text((base.width // 2, starting_at[1] + current_y), f'{constant_group[0].constant:.1f}', fill='black', font=font, anchor='mm')
+            overlay_draw.text((base.width // 2, starting_at[1] + current_y), f'{constant_group[0].constant:.1f}', fill='black', font=font, anchor='mm')
             current_y += constant_background.height // 2 + category_compensate
             for idx, record in enumerate(constant_group):
                 if idx % line_len == 0 and idx != 0:
@@ -100,7 +102,7 @@ class ChuniScoreListGenerate2025:
                 song = ChuniScoreListGenerate2025.generate_single_song(record).resize(scale_to)
                 paste_at = (starting_at[0] + idx % line_len * (song.width + spacing),
                             starting_at[1] + current_y + y_compensate)
-                base.alpha_composite(song, paste_at)
+                overlay.paste(song, paste_at)
                 if 1007500 <= record.score <= 1008999:
                     sss_counter += 1
                 elif 1009000 <= record.score <= 1010000:
@@ -110,6 +112,7 @@ class ChuniScoreListGenerate2025:
                 elif record.judge_status == 'fullcombo':
                     fc_counter += 1
             current_y += scale_to[1] + spacing + y_compensate
+        base.alpha_composite(overlay)
 
         font = font.font_variant(size=43)
         source = util.get_api_name(api)

@@ -38,8 +38,10 @@ def get_fc_text_strip(status: str, score: Decimal) -> Tuple[str, str]:
         return 'AJ', '#ffae38'
     elif status == 'fullcombo' or status == 'fullchain' or status == 'fullchain2':
         return 'FC', '#00cd98'
+    elif score == -1:
+        return 'NP', ''
     else:
-        return '--', 'white'
+        return '--', ''
 
 def draw_four_digit_rating(base_im_draw: ImageDraw.ImageDraw, ra: Decimal, text_prefix: str,
                            main_font: FreeTypeFont, sub_font: FreeTypeFont, position: Tuple[int, int],

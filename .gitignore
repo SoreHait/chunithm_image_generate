@@ -4,3 +4,4 @@ __pycache__
 chunithm_image_generate/constants.py
 test.py
 .idea
+chunithm_image_generate/generators/res/jacketpng

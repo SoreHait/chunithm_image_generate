@@ -47,7 +47,8 @@ class ChuniBestsGenerate2025:
         font = font.font_variant(size=120)
         font_small = font.font_variant(size=70)
         fc_str, fc_color = util.get_fc_text_strip(record.judge_status, record.score)
-        base_draw.polygon([(1100, 575), (850, 825), (715, 825), (965, 575)], fill=fc_color)
+        if fc_color:
+            base_draw.polygon([(1100, 575), (850, 825), (715, 825), (965, 575)], fill=fc_color)
         base_draw.text((930, 685), text=fc_str, fill='black', font=font, anchor='ms')
 
         base_draw.text((1225, 685), text=f'{record.constant:.1f}', fill='black', font=font_small, anchor='rs')

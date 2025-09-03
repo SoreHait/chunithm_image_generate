@@ -21,9 +21,17 @@ def get_louis_scorelist(account: Union[str, int], level: str, keep_all: bool = F
         raise requests.exceptions.HTTPError("Failed to get player scorelist. Using API: louis")
     player_model = get_louis_player(account, qq=qq)
     song_data = cache_manage.get_louis_constant()
-    if keep_all:
-        return scorelist.ScoreList.from_louis_all(player_model, resp.json(), song_data, level)
-    return scorelist.ScoreList.from_louis(player_model, resp.json(), song_data)
+    try:
+        if keep_all:
+            return scorelist.ScoreList.from_louis_all(player_model, resp.json(), song_data, level)
+        return scorelist.ScoreList.from_louis(player_model, resp.json(), song_data)
+    except KeyError:
+        print("Louis songlist seems outdated, updating")
+        cache_manage.remove_cache()
+        song_data = cache_manage.get_louis_constant()
+        if keep_all:
+            return scorelist.ScoreList.from_louis_all(player_model, resp.json(), song_data, level)
+        return scorelist.ScoreList.from_louis(player_model, resp.json(), song_data)
 
 def get_louis_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
     endpoint = f"{LOUIS_URL}/api/open/chunithm/basic-info"
@@ -32,7 +40,13 @@ def get_louis_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
     if resp.status_code != 200:
         raise requests.exceptions.HTTPError("Failed to get player bests. Using API: louis")
     song_data = cache_manage.get_louis_constant()
-    return bests.Bests.from_louis(resp.json(), song_data)
+    try:
+        return bests.Bests.from_louis(resp.json(), song_data)
+    except KeyError:
+        print("Louis songlist seems outdated, updating")
+        cache_manage.remove_cache()
+        song_data = cache_manage.get_louis_constant()
+        return bests.Bests.from_louis(resp.json(), song_data)
 
 def get_divingfish_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
     endpoint = f"{DIVINGFISH_URL}/api/chunithmprober/query/player"
@@ -56,4 +70,10 @@ def get_lxns_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
     if resp.status_code != 200:
         raise requests.exceptions.HTTPError("Failed to get player bests. Using API: lxns")
     song_data = cache_manage.get_lxns_constant()
-    return bests.Bests.from_lxns(player_model, resp.json()["data"], song_data)
+    try:
+        return bests.Bests.from_lxns(player_model, resp.json()["data"], song_data)
+    except KeyError:
+        print("Lxns songlist seems outdated, updating")
+        cache_manage.remove_cache()
+        song_data = cache_manage.get_lxns_constant()
+        return bests.Bests.from_lxns(player_model, resp.json()["data"], song_data)

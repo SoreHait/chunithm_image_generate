@@ -75,8 +75,10 @@ def get_ratingcolor(rating: Decimal) -> str:
         ratingcolor = "#FFD937"
     elif 15.25 <= rating < 16:
         ratingcolor = "#FAD9A4"
-    elif rating >= 16:
-        ratingcolor = "colorful"
+    elif 16 <= rating < 17:
+        ratingcolor = "16"
+    elif rating >= 17:
+        ratingcolor = "17"
     else:
         raise ValueError("Rating out of range")
     return ratingcolor

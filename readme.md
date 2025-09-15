@@ -5,6 +5,6 @@ subproject for chieribot chunithm module
 - ~~drop support for 2025 aprilfools~~
 - ~~remove version-specified naming scheme~~
 - ~~autoupdate of songlist~~
-- scorelist: show not played songs (api not written yet)
-- 2026(verse) support (done arts & layouts, waiting for data api support)
+- ~~scorelist: show not played songs~~
+- 2026(verse) support (pending api tests)
 - add support for lxns scorelist (longterm)

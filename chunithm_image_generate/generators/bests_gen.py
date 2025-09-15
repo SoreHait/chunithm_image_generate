@@ -66,14 +66,10 @@ class ChuniBestsGenerate:
 
     @staticmethod
     def generate_bests_layout(bests_data: bests.Bests, api: str) -> Image.Image:
-        # TEMPORAL: FOR TEST PURPOSES ONLY
-        bests_data.recents.extend(bests_data.recents)
-        # TEMPORAL: FOR TEST PURPOSES ONLY
-
         if len(bests_data.bests) == 0:
             raise ValueError(f"User Bests has no records. Using API: {api}")
         bests_data.bests.sort(key=lambda x: x.ra_precise, reverse=True)
-        bests_data.recents.sort(key=lambda x: x.ra_precise, reverse=True)
+        bests_data.currents.sort(key=lambda x: x.ra_precise, reverse=True)
 
         panel_gap = 50
         right_panel_layout = (2, 10)
@@ -91,7 +87,7 @@ class ChuniBestsGenerate:
                 break
             base.paste(card, (starting_pos[0] + col * card.width, starting_pos[1] + row * card.height))
         right_panel_starting_pos = (starting_pos[0] + left_panel_layout[0] * card.width + panel_gap, starting_pos[1])
-        for idx, item in enumerate(bests_data.recents):
+        for idx, item in enumerate(bests_data.currents):
             card = ChuniBestsGenerate.generate_song_card(item, idx + 1)
             row = idx // right_panel_layout[0]
             col = idx % right_panel_layout[0]
@@ -106,17 +102,13 @@ class ChuniBestsGenerate:
 
         font = ImageFont.truetype(os.path.join(FONT_PATH, 'LINESeedJP_OTF_Bd.otf'), size=45)
         font_small = font.font_variant(size=25)
-        trailing_white = 15
         bg_draw.text((325, 263), text=f'Rating', fill='black', font=font, anchor='lm')
 
         starting_pos = (520, 280)
-        width = util.draw_four_digit_rating(bg_draw, bests_data.player_rating_4dg, '',
-                                              font, font_small, starting_pos, 3)
-        util.draw_four_digit_rating(bg_draw, bests_data.max_rating_4dg, '/ ',
-                                      font, font_small, (starting_pos[0]+width+trailing_white, starting_pos[1]), 3)
+        util.draw_four_digit_rating(bg_draw, bests_data.player_rating_4dg, '', font, font_small, starting_pos, 3)
 
-        util.draw_four_digit_rating(bg_draw, bests_data.b30_avg_4dg, '', font, font_small, (390, 423), 3)
-        util.draw_four_digit_rating(bg_draw, bests_data.r10_avg_4dg, '', font, font_small, (1480, 423), 3)
+        util.draw_four_digit_rating(bg_draw, bests_data.bests_avg_4dg, '', font, font_small, (390, 423), 3)
+        util.draw_four_digit_rating(bg_draw, bests_data.currents_avg_4dg, '', font, font_small, (1480, 423), 3)
 
         font = font.font_variant(size=30)
         source = util.get_api_name(api)

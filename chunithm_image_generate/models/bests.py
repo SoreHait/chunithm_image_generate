@@ -57,46 +57,39 @@ class Bests:
     nickname: str
     api: str
     bests: List[RecordItem]
-    recents: List[RecordItem]
+    currents: List[RecordItem]
 
     @property
-    def __b30_sum(self) -> Decimal:
+    def __bests_sum(self) -> Decimal:
         x = Decimal('0')
         for i in self.bests:
             x += i.ra_2dg
         return x
 
     @property
-    def __r10_sum(self) -> Decimal:
+    def __currents_sum(self) -> Decimal:
         x = Decimal('0')
-        for i in self.recents:
+        for i in self.currents:
             x += i.ra_2dg
         return x
 
     @property
     def player_rating_4dg(self) -> Decimal:
-        return cut_digits((self.__b30_sum + self.__r10_sum) / 40, 4)
+        return cut_digits((self.__bests_sum + self.__currents_sum) / 50, 4)
 
     @property
-    def b30_avg_4dg(self) -> Decimal:
-        return cut_digits(self.__b30_sum / 30, 4)
+    def bests_avg_4dg(self) -> Decimal:
+        return cut_digits(self.__bests_sum / 30, 4)
 
     @property
-    def r10_avg_4dg(self) -> Decimal:
-        return cut_digits(self.__r10_sum / 10, 4)
-
-    @property
-    def max_rating_4dg(self) -> Decimal:
-        if len(self.bests) == 0:
-            raise ValueError(f"User Bests has no records. Using API: {self.api}")
-        else:
-            return cut_digits((self.__b30_sum + self.bests[0].ra_2dg * 10) / 40, 4)
+    def currents_avg_4dg(self) -> Decimal:
+        return cut_digits(self.__currents_sum / 20, 4)
 
     @classmethod
     def from_lxns(cls, player_model: player.Player, bests_data: dict, song_info: dict) -> "Bests":
         bests_model: lxns.LxnsBestsRecords = lxns.LxnsBestsRecords.parse_obj(bests_data)
         bests = []
-        recents = []
+        currents = []
 
         def __lxns_to_bests(l: lxns.LxnsBestsRecordItem) -> RecordItem:
             return RecordItem(
@@ -111,15 +104,15 @@ class Bests:
 
         for record in bests_model.bests:
             bests.append(__lxns_to_bests(record))
-        for record in bests_model.recents:
-            recents.append(__lxns_to_bests(record))
-        return cls(player_model.nickname, 'lxns', bests, recents)
+        for record in bests_model.currents:
+            currents.append(__lxns_to_bests(record))
+        return cls(player_model.nickname, 'lxns', bests, currents)
 
     @classmethod
     def from_louis(cls, bests_data: dict, song_info: dict) -> "Bests":
         bests_model: louis.LouisBests = louis.LouisBests.parse_obj(bests_data)
         bests = []
-        recents = []
+        currents = []
 
         for record in bests_model.records.b30:
             constant = Decimal(song_info[str(record.music_id)][str(record.level_index)])
@@ -132,10 +125,10 @@ class Bests:
                 score=record.score,
                 title=song_info[str(record.music_id)]['title']
             ))
-        for record in bests_model.records.r10:
+        for record in bests_model.records.n20:
             level_index = {'basic': 0, 'advanced': 1, 'expert': 2, 'master': 3, 'ultimate': 4}[record.difficulty]
             constant = Decimal(song_info[str(record.music_id)][str(level_index)])
-            recents.append(RecordItem(
+            currents.append(RecordItem(
                 constant=constant,
                 judge_status=record.judge_status,
                 level=f'{constant // 1}{"+" if constant % 1 >= Decimal("0.5") else ""}',
@@ -144,7 +137,7 @@ class Bests:
                 score=record.score,
                 title=song_info[str(record.music_id)]['title']
             ))
-        return cls(unicodedata.normalize('NFKC', bests_model.nickname), 'louis', bests, recents)
+        return cls(unicodedata.normalize('NFKC', bests_model.nickname), 'louis', bests, currents)
 
     @classmethod
     def from_divingfish(cls, bests_data: dict) -> "Bests":

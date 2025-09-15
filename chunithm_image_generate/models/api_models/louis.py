@@ -26,7 +26,7 @@ class LouisRecentsRecordItem(BaseModel):
 
 class LouisBestsRecords(BaseModel):
     b30: List[LouisRecordItem]
-    r10: List[LouisRecentsRecordItem]
+    n20: List[LouisRecentsRecordItem]
 
 
 class LouisBests(BaseModel):

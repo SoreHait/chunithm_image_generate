@@ -100,7 +100,8 @@ class ChuniScoreListGenerate:
                     sss_counter += 1
                 elif 1009000 <= record.score <= 1010000:
                     sssp_counter += 1
-                if record.judge_status == 'alljustice' or record.judge_status == 'alljusticecritical':
+
+                if record.judge_status == 'alljustice' or record.judge_status == 'alljusticecritical' or record.score == 1010000:
                     aj_counter += 1
                 elif record.judge_status == 'fullcombo':
                     fc_counter += 1

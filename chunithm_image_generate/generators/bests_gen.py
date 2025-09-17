@@ -102,9 +102,9 @@ class ChuniBestsGenerate:
 
         font = ImageFont.truetype(os.path.join(FONT_PATH, 'LINESeedJP_OTF_Bd.otf'), size=45)
         font_small = font.font_variant(size=25)
-        bg_draw.text((325, 263), text=f'Rating', fill='black', font=font, anchor='lm')
+        bg_draw.text((435, 263), text=f'Rating', fill='black', font=font, anchor='lm')
 
-        starting_pos = (520, 280)
+        starting_pos = (630, 280)
         util.draw_four_digit_rating(bg_draw, bests_data.player_rating_4dg, '', font, font_small, starting_pos, 3)
 
         util.draw_four_digit_rating(bg_draw, bests_data.bests_avg_4dg, '', font, font_small, (390, 423), 3)

@@ -104,7 +104,7 @@ class Bests:
 
         for record in bests_model.bests:
             bests.append(__lxns_to_bests(record))
-        for record in bests_model.currents:
+        for record in bests_model.new_bests:
             currents.append(__lxns_to_bests(record))
         return cls(player_model.nickname, 'lxns', bests, currents)
 
@@ -114,29 +114,22 @@ class Bests:
         bests = []
         currents = []
 
+        def __louis_to_bests(l: louis.LouisRecordItem) -> RecordItem:
+            constant = Decimal(song_info[str(l.music_id)][str(l.level_index)])
+            return RecordItem(
+                constant=constant,
+                judge_status=l.judge_status,
+                level=f'{constant // 1}{"+" if constant % 1 >= Decimal("0.5") else ""}',
+                difficulty=l.level_index,
+                music_id=l.music_id,
+                score=l.score,
+                title=song_info[str(l.music_id)]['title']
+            )
+
         for record in bests_model.records.b30:
-            constant = Decimal(song_info[str(record.music_id)][str(record.level_index)])
-            bests.append(RecordItem(
-                constant=constant,
-                judge_status=record.judge_status,
-                level=f'{constant // 1}{"+" if constant % 1 >= Decimal("0.5") else ""}',
-                difficulty=record.level_index,
-                music_id=record.music_id,
-                score=record.score,
-                title=song_info[str(record.music_id)]['title']
-            ))
+            bests.append(__louis_to_bests(record))
         for record in bests_model.records.n20:
-            level_index = {'basic': 0, 'advanced': 1, 'expert': 2, 'master': 3, 'ultimate': 4}[record.difficulty]
-            constant = Decimal(song_info[str(record.music_id)][str(level_index)])
-            currents.append(RecordItem(
-                constant=constant,
-                judge_status=record.judge_status,
-                level=f'{constant // 1}{"+" if constant % 1 >= Decimal("0.5") else ""}',
-                difficulty=level_index,
-                music_id=record.music_id,
-                score=record.score,
-                title=song_info[str(record.music_id)]['title']
-            ))
+            currents.append(__louis_to_bests(record))
         return cls(unicodedata.normalize('NFKC', bests_model.nickname), 'louis', bests, currents)
 
     @classmethod

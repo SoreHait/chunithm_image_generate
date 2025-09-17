@@ -19,4 +19,4 @@ class LxnsBestsRecordItem(BaseModel):
 
 class LxnsBestsRecords(BaseModel):
     bests: List[LxnsBestsRecordItem]
-    currents: List[LxnsBestsRecordItem]
+    new_bests: List[LxnsBestsRecordItem]

@@ -89,6 +89,6 @@ def get_api_name(api: str) -> str:
     elif api == 'lxns':
         return 'Lxns'
     elif api == 'divingfish':
-        return 'Diving-Fish'
+        return 'Diving-Fish (Outdated API - Might have compatibility issues)'
     else:
         return 'Unknown'

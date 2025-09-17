@@ -14,19 +14,9 @@ class LouisRecordItem(BaseModel):
         alias_generator = lambda s: re.sub('_(.)', lambda m: m.group(1).upper(), s)
 
 
-class LouisRecentsRecordItem(BaseModel):
-    music_id: int
-    difficulty: str
-    score: Decimal
-    judge_status: str
-
-    class Config:
-        alias_generator = lambda s: re.sub('_(.)', lambda m: m.group(1).upper(), s)
-
-
 class LouisBestsRecords(BaseModel):
     b30: List[LouisRecordItem]
-    n20: List[LouisRecentsRecordItem]
+    n20: List[LouisRecordItem]
 
 
 class LouisBests(BaseModel):

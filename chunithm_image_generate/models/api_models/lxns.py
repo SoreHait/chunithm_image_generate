@@ -20,3 +20,14 @@ class LxnsBestsRecordItem(BaseModel):
 class LxnsBestsRecords(BaseModel):
     bests: List[LxnsBestsRecordItem]
     new_bests: List[LxnsBestsRecordItem]
+
+
+class LxnsScore(BaseModel):
+    id: int
+    full_combo: Optional[str]
+    level_index: int
+    score: Decimal
+
+
+class LxnsScoreList(BaseModel):
+    data: List[LxnsScore]

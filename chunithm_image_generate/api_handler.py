@@ -77,3 +77,15 @@ def get_lxns_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
         cache_manage.remove_cache()
         song_data = cache_manage.get_lxns_constant()
         return bests.Bests.from_lxns(player_model, resp.json()["data"], song_data)
+
+def get_lxns_scorelist(account: Union[str, int], token: str, level: str, keep_all: bool = False, *, qq: bool) -> scorelist.ScoreList:
+    player_model = get_lxns_player(account, qq=qq)
+    endpoint = f"{LXNS_URL}/api/v0/user/chunithm/player/scores"
+    headers = {"Content-Type": "application/json", "X-User-Token": token}
+    resp = requests.get(endpoint, headers=headers)
+    if resp.status_code != 200:
+        raise requests.exceptions.HTTPError("Failed to get player scorelist. Using API: lxns")
+    song_data = cache_manage.get_lxns_constant()
+    if keep_all:
+        return scorelist.ScoreList.from_lxns_all(player_model, resp.json(), song_data, level)
+    return scorelist.ScoreList.from_lxns(player_model, resp.json(), song_data, level)

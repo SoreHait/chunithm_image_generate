@@ -9,16 +9,20 @@ def get_louis_player(account: Union[str, int], *, qq: bool) -> player.Player:
     endpoint = f"{LOUIS_URL}/api/open/chunithm/user-info"
     body = {"qq" if qq else "username": account}
     resp = requests.post(endpoint, json=body, headers=LOUIS_HEADERS)
-    if resp.status_code != 200:
-        raise requests.exceptions.HTTPError("Failed to get player info. Using API: louis")
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise requests.exceptions.HTTPError("Failed to get player info. Using API: louis") from e
     return player.Player.from_louis(resp.json())
 
 def get_louis_scorelist(account: Union[str, int], level: str, keep_all: bool = False, *, qq: bool) -> scorelist.ScoreList:
     endpoint = f"{LOUIS_URL}/api/open/chunithm/filtered-info"
     body = {"qq" if qq else "username": account, "level": f"{level}-{level}"}
     resp = requests.post(endpoint, json=body, headers=LOUIS_HEADERS)
-    if resp.status_code != 200:
-        raise requests.exceptions.HTTPError("Failed to get player scorelist. Using API: louis")
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise requests.exceptions.HTTPError("Failed to get player scorelist. Using API: louis") from e
     player_model = get_louis_player(account, qq=qq)
     song_data = cache_manage.get_louis_constant()
     try:
@@ -37,8 +41,10 @@ def get_louis_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
     endpoint = f"{LOUIS_URL}/api/open/chunithm/basic-info"
     body = {"qq" if qq else "username": account}
     resp = requests.post(endpoint, json=body, headers=LOUIS_HEADERS)
-    if resp.status_code != 200:
-        raise requests.exceptions.HTTPError("Failed to get player bests. Using API: louis")
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise requests.exceptions.HTTPError("Failed to get player bests. Using API: louis") from e
     song_data = cache_manage.get_louis_constant()
     try:
         return bests.Bests.from_louis(resp.json(), song_data)
@@ -52,23 +58,29 @@ def get_divingfish_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
     endpoint = f"{DIVINGFISH_URL}/api/chunithmprober/query/player"
     body = {"qq" if qq else "username": account}
     resp = requests.post(endpoint, json=body, headers=DIVINGFISH_HEADERS)
-    if resp.status_code != 200:
-        raise requests.exceptions.HTTPError("Failed to get player bests. Using API: divingfish")
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise requests.exceptions.HTTPError("Failed to get player bests. Using API: divingfish") from e
     return bests.Bests.from_divingfish(resp.json())
 
 def get_lxns_player(account: Union[str, int], *, qq: bool) -> player.Player:
     endpoint = f"{LXNS_URL}/api/v0/chunithm/player/qq/{account}" if qq else f"{LXNS_URL}/api/v0/chunithm/player/{account}"
     resp = requests.get(endpoint, headers=LXNS_HEADERS)
-    if resp.status_code != 200:
-        raise requests.exceptions.HTTPError("Failed to get player info. Using API: lxns")
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise requests.exceptions.HTTPError("Failed to get player info. Using API: lxns") from e
     return player.Player.from_lxns(resp.json()["data"])
 
 def get_lxns_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
     player_model = get_lxns_player(account, qq=qq)
     endpoint = f"{LXNS_URL}/api/v0/chunithm/player/{player_model.friend_code}/bests"
     resp = requests.get(endpoint, headers=LXNS_HEADERS)
-    if resp.status_code != 200:
-        raise requests.exceptions.HTTPError("Failed to get player bests. Using API: lxns")
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise requests.exceptions.HTTPError("Failed to get player bests. Using API: lxns") from e
     song_data = cache_manage.get_lxns_constant()
     try:
         return bests.Bests.from_lxns(player_model, resp.json()["data"], song_data)
@@ -81,10 +93,12 @@ def get_lxns_bests(account: Union[str, int], *, qq: bool) -> bests.Bests:
 def get_lxns_scorelist(account: Union[str, int], token: str, level: str, keep_all: bool = False, *, qq: bool) -> scorelist.ScoreList:
     player_model = get_lxns_player(account, qq=qq)
     endpoint = f"{LXNS_URL}/api/v0/user/chunithm/player/scores"
-    headers = {"Content-Type": "application/json", "X-User-Token": token}
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
     resp = requests.get(endpoint, headers=headers)
-    if resp.status_code != 200:
-        raise requests.exceptions.HTTPError("Failed to get player scorelist. Using API: lxns")
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise requests.exceptions.HTTPError("Failed to get player scorelist. Using API: lxns") from e
     song_data = cache_manage.get_lxns_constant()
     if keep_all:
         return scorelist.ScoreList.from_lxns_all(player_model, resp.json(), song_data, level)

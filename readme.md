@@ -7,4 +7,4 @@ subproject for chieribot chunithm module
 - ~~autoupdate of songlist~~
 - ~~scorelist: show not played songs~~
 - ~~2026(verse) support~~
-- ~~ add support for lxns scorelist (longterm) ~~
+- ~~add support for lxns scorelist (longterm)~~
